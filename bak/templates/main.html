@@ -1,0 +1,43 @@
+{{ define "main" }}
+    <!-- Графики -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Изменение буферного и затрубного давления</h5>
+                    <img src="static/images/graph1.png" alt="График буферного и затрубного давлений" class="img-fluid">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Изменение дебита и высоты столба ГЖС</h5>
+                    <img src="static/images/graph2.png" alt="График дебита и высоты столба ГЖС" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица -->
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .Items }}
+                <tr>
+                    <td>{{ .ID }}</td>
+                    <td>{{ .Name }}</td>
+                    <td>{{ .Status }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+{{ end }}

@@ -1,0 +1,113 @@
+{{ define "index2" }}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Список газовых скважин</h1>
+        <a href="/create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Добавить новую скважину
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="w-5">ID</th>
+                    <th class="w-20">Название</th>
+                    <th class="w-25">Местоположение</th>
+                    <th class="w-15">Добыча (м³/сут)</th>
+                    <th class="w-15">Статус</th>
+                    <th class="w-20 text-end">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .}}
+                <tr data-well-id="{{.ID}}"> <!-- Важно! -->
+                    <td class="fw-semibold">{{.ID}}</td>
+                    <td>{{.Name}}</td>
+                    <td class="text-truncate" style="max-width: 250px;" title="{{.Location}}">{{.Location}}</td>
+                    <td>{{.Q | formatNumber}}</td>
+                    <td>
+                        <span class="badge 
+                            {{if eq .Status "active"}}bg-success
+                            {{else if eq .Status "inactive"}}bg-secondary
+                            {{else if eq .Status "maintenance"}}bg-warning text-dark
+                            {{else}}bg-info{{end}}">
+                            {{.Status | title}}
+                        </span>
+                    </td>
+                    <td class="text-nowrap text-end">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a href="/view/{{.ID}}" class="btn btn-outline-info" title="Просмотр">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="/edit/{{.ID}}" class="btn btn-outline-primary" title="Редактировать">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="/delete/{{.ID}}" class="btn btn-outline-danger" 
+                               title="Удалить" 
+                               onclick="return confirm('Вы уверены, что хотите удалить скважину {{.Name}}?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {{else}}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">
+                        Нет данных о скважинах
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+</div>
+ <!-- В конец index.html (перед закрывающим </body>) -->
+<!-- Модальное окно для графиков -->
+<div class="modal fade" id="graphsModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Графики скважины <span id="modalWellName"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <img id="modalPressureGraph" src="" class="img-fluid rounded border shadow" style="max-height: 400px;">
+            <p class="mt-2 text-muted">Давление (атм)</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <img id="modalDebitGraph" src="" class="img-fluid rounded border shadow" style="max-height: 400px;">
+            <p class="mt-2 text-muted">Дебит (м³/сут)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Показываем графики при клике на строку таблицы
+document.querySelectorAll('tr[data-well-id]').forEach(row => {
+  row.addEventListener('click', function(e) {
+    // Если кликнули по кнопке "удалить" - не открываем модалку
+    if (e.target.closest('a[href*="delete"]')) return;
+    
+    const wellId = this.getAttribute('data-well-id');
+    const wellName = this.querySelector('td:nth-child(2)').textContent;
+    
+    // Устанавливаем данные в модалку
+    document.getElementById('modalWellName').textContent = wellName;
+    document.getElementById('modalPressureGraph').src = `/static/images/graph${wellId}_1.png`;
+    document.getElementById('modalDebitGraph').src = `/static/images/graph${wellId}_2.png`;
+    
+    // Открываем модальное окно
+    new bootstrap.Modal('#graphsModal').show();
+  });
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" 
+        crossorigin="anonymous"></script>   
+{{ end }}
